@@ -31,17 +31,36 @@ fn main() {
     // }
     let mut vecofdist= Vec::new();
     let i=vecofgcoord[0].clone();
-    for i in vecofgcoord.clone()
+    // for i in vecofgcoord.clone()
      {
         let source=Location::new(i[0],i[1]);
         for j in vecofgcoord.clone() {
             let dest=Location::new(j[0],j[1]);
             let distance = source.haversine_distance_to(&dest);
-            vecofdist.push(distance.meters()*0.001)
+            vecofdist.push((distance.meters()*0.001).round().to_string())
         }
     }
+    let mut sb=String::new();
+    for i in vecofdist.clone(){
+        sb=(format!("{} , {}",sb,i))
+    }
+    println!("{:?}",sb.len());
     println!("{:?}",vecofdist.len());
-    fs::write("../test.txt", format!("{:?}",vecofdist)).unwrap();
+    let mut f = File::options().write(true).append(true).create(true).open("../test.txt").unwrap();
+    let mut lw=LineWriter::new(f);
+    fs::write("../test.txt", serde_json::to_string(&vecofdist).unwrap());
+    // for (index,i) in (vecofdist.iter().enumerate()){
+    //     lw.write_all(&format!("{}",i).as_bytes());
+    //     if(index%vecofdist.len()==0){
+
+    //         lw.write_all(b"\n");
+    //     }
+    //     else{
+    //         lw.write_all(b" , ");
+
+    //     }
+    // }
+    // fs::write("../test.txt", format!("{:?}",vecofdist)).unwrap();
     // let result: Vec<String> = vecofstationnames.iter().flat_map(|x| vec![x.clone(); vecofstationnames.len()]).collect();
     // vecofgtypes.sort();
     vecofgtypes.dedup();
@@ -50,7 +69,7 @@ fn main() {
 
 }
 use core::time;
-use std::{fs, vec};
+use std::{fs::{self, File}, io::{LineWriter, Write}, vec};
 
 use geoutils::Location;
 use serde::{de, Deserialize, Serialize};
