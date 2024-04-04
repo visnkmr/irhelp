@@ -13,10 +13,10 @@ app.layout = html.Div([
     dcc.Slider(
         id='distance-slider',
         min=0,
-        max=100, # Adjust the max value as needed
+        max=1800, # Adjust the max value as needed
         step=1,
         value=50, # Default value
-        marks={i: str(i) for i in range(0, 101, 10)}, # Optional: marks on the slider
+        marks={i: str(i) for i in range(0, 1800, 100)}, # Optional: marks on the slider
     ),
     dcc.Graph(id='scatter-plot')
 ])
