@@ -3,8 +3,25 @@
 //     name:String,
 //     distance:f64
 // }
+#[derive(Clone,Serialize,Deserialize,Debug)]
+struct statdist{
+        name:String,
+    xycoord:String,
+    distance:f64
+}
+fn convert_spherical_to_cartesian(latitude: f64, longitude: f64, radius: f64) -> (f64, f64) {
+    // Convert from Degrees to Radians
+    let lat_rad = latitude * std::f64::consts::PI / 180.0;
+    let lon_rad = longitude * std::f64::consts::PI / 180.0;
+
+    // Calculate x and y
+    let x = radius * lat_rad.cos() * lon_rad.cos();
+    let y = radius * lat_rad.cos() * lon_rad.sin();
+
+    (x.round(), y.round())
+}
 fn main() {
-    // fs::write("../test.txt", format!("{:?}","")).unwrap();
+    fs::write("../test.txt", format!("{:?}","")).unwrap();
     let fileread=fs::read_to_string("../export.geojson").unwrap();
     // println!("{:?}",fileread.lines().count());
     let data = &fileread;
@@ -41,10 +58,11 @@ fn main() {
     //     println!("{:?}",vecofgcoord[i]);
     // }
     // let mut vvecofdist= Vec::new();
-    // let found:Vec<usize>=vecofstationnames.iter().enumerate().filter_map(|(l,f)|if(f.to_lowercase().contains("")){Some(l)}else{None}).collect();
-    // println!("{:?}",found);
-    // let i=vecofgcoord[found[0]].clone();
-    for (ci,i) in vecofgcoord.clone().iter().enumerate()
+    let found:Vec<usize>=vecofstationnames.iter().enumerate().filter_map(|(l,f)|if(f.to_lowercase().contains("")){Some(l)}else{None}).collect();
+    println!("{:?}",found);
+    let ci=found[0];
+    let i=vecofgcoord[ci].clone();
+    // for (ci,i) in vecofgcoord.clone().iter().enumerate()
      {
         let mut vecofdist= Vec::new();
         let source=Location::new(i[0],i[1]);
@@ -52,11 +70,13 @@ fn main() {
             let dest=Location::new(j[0],j[1]);
             let distance = source.haversine_distance_to(&dest);
             vecofdist.push(
-            // statdist{
+            statdist{
                 // name:format!("from {} to {}",vecofstationnames[found[0]],vecofstationnames[index]),
-                // distance:
+                name:format!("{:?}",vecofstationnames[index]),
+                xycoord:format!("{:?}",((convert_spherical_to_cartesian(j[0],j[1], 6367.)).0-(convert_spherical_to_cartesian(i[0],i[1], 6367.)).0,convert_spherical_to_cartesian(j[0],j[1], 6367.).1-(convert_spherical_to_cartesian(i[0],i[1], 6367.)).1)),
+                distance:
                 (distance.meters()*0.001).round()
-            // }
+            }
         )
         }
         println!("{ci}");
