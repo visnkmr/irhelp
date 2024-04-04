@@ -14,7 +14,9 @@ for item in datas:
     dist = item['distance']
     if(dist<50):
         # print((name))
-        data.append(go.Scatter(x=[float(x)], y=[float(y)], mode='markers', name=named+str(float(dist)) ))
+        data.append(go.Scatter(x=[float(x)], y=[float(y)], hovertemplate =
+    '<b>%{text}</b>',
+    text = [named+" "+str(float(dist))+" km"], mode='markers',name=named ))
     nos=nos+1;
     # if(nos>8):
     #     break;
