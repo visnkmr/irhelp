@@ -19,6 +19,7 @@ fn convert_spherical_to_cartesian(latitude: f64, longitude: f64, radius: f64) ->
     let y = radius * lat_rad.cos() * lon_rad.sin();
 
     (x.round(), y.round())
+    // (latitude.round(),longitude.round())
 }
 fn main() {
     fs::write("../test.txt", format!("{:?}","")).unwrap();
@@ -65,22 +66,22 @@ fn main() {
     // for (ci,i) in vecofgcoord.clone().iter().enumerate()
      {
         let mut vecofdist= Vec::new();
-        let source=Location::new(i[0],i[1]);
+        let source=Point::new(i[0],i[1]);
         for (index,j) in vecofgcoord.clone().iter().enumerate() {
-            let dest=Location::new(j[0],j[1]);
-            let distance = source.haversine_distance_to(&dest);
+            let dest=Point::new(j[0],j[1]);
+            let distance = source.haversine_distance(&dest);
             vecofdist.push(
             statdist{
                 // name:format!("from {} to {}",vecofstationnames[found[0]],vecofstationnames[index]),
                 name:format!("{:?}",vecofstationnames[index]),
                 xycoord:format!("{:?}",((convert_spherical_to_cartesian(j[0],j[1], 6367.)).0-(convert_spherical_to_cartesian(i[0],i[1], 6367.)).0,convert_spherical_to_cartesian(j[0],j[1], 6367.).1-(convert_spherical_to_cartesian(i[0],i[1], 6367.)).1)),
                 distance:
-                (distance.meters()*0.001).round()
+                (distance*0.001).round()
             }
         )
         }
         println!("{ci}");
-        fs::write(format!("./{ci}.txt"), serde_json::to_string(&vecofdist).unwrap());
+        fs::write(format!("./selected.txt"), serde_json::to_string(&vecofdist).unwrap());
         // vvecofdist.push(vecofdist)
     }
     println!("finished computation");
@@ -122,7 +123,7 @@ fn main() {
 use core::time;
 use std::{cmp::Ordering, fs::{self, File}, io::{LineWriter, Write}, vec};
 
-use geoutils::Location;
+use geo::{HaversineDistance, Point};
 use serde::{de, Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
