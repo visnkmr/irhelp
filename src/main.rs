@@ -19,8 +19,8 @@ fn convert_spherical_to_cartesian(latitude: f64, longitude: f64, radius: f64) ->
     let x = radius * lat_rad.cos() * lon_rad.cos();
     let y = radius * lat_rad.cos() * lon_rad.sin();
 
-    (x.round(), y.round())
-    // (latitude.round(),longitude.round())
+    // (x.round(), y.round())
+    (latitude,longitude)
 }
 fn main() {
     fs::write("../selected.json", format!("{:?}","")).unwrap();
@@ -71,9 +71,16 @@ fn main() {
         for (index,j) in vecofgcoord.clone().iter().enumerate() {
             let dest=Point::new(j[0],j[1]);
             let distance = (source.haversine_distance(&dest)*0.001).round();
-            if(distance<50.){
-                
-                vecofdist.push(
+            // if(distance<250.)
+            {
+                // if(
+                //     vecofstationnames[index].to_lowercase().contains("")
+                //     ||
+                //     vecofstationnames[index].to_lowercase().contains("")
+                //     ||
+                //     vecofstationnames[index].to_lowercase().contains("")
+                // )
+                {vecofdist.push(
                 statdist{
                     // name:format!("from {} to {}",vecofstationnames[found[0]],vecofstationnames[index]),
                     name:format!("{:?}",vecofstationnames[index]),
@@ -82,7 +89,7 @@ fn main() {
                     distance:
                     (distance)
                 }
-            )
+            )}
             }
         }
         println!("{ci}");
