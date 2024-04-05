@@ -6,7 +6,8 @@
 #[derive(Clone,Serialize,Deserialize,Debug)]
 struct statdist{
         name:String,
-    xycoord:String,
+    xcoord:f64,
+    ycoord:f64,
     distance:f64
 }
 fn convert_spherical_to_cartesian(latitude: f64, longitude: f64, radius: f64) -> (f64, f64) {
@@ -22,7 +23,7 @@ fn convert_spherical_to_cartesian(latitude: f64, longitude: f64, radius: f64) ->
     // (latitude.round(),longitude.round())
 }
 fn main() {
-    fs::write("../test.txt", format!("{:?}","")).unwrap();
+    fs::write("../selected.json", format!("{:?}","")).unwrap();
     let fileread=fs::read_to_string("../export.geojson").unwrap();
     // println!("{:?}",fileread.lines().count());
     let data = &fileread;
@@ -69,29 +70,34 @@ fn main() {
         let source=Point::new(i[0],i[1]);
         for (index,j) in vecofgcoord.clone().iter().enumerate() {
             let dest=Point::new(j[0],j[1]);
-            let distance = source.haversine_distance(&dest);
-            vecofdist.push(
-            statdist{
-                // name:format!("from {} to {}",vecofstationnames[found[0]],vecofstationnames[index]),
-                name:format!("{:?}",vecofstationnames[index]),
-                xycoord:format!("{:?}",((convert_spherical_to_cartesian(j[0],j[1], 6367.)).0-(convert_spherical_to_cartesian(i[0],i[1], 6367.)).0,convert_spherical_to_cartesian(j[0],j[1], 6367.).1-(convert_spherical_to_cartesian(i[0],i[1], 6367.)).1)),
-                distance:
-                (distance*0.001).round()
+            let distance = (source.haversine_distance(&dest)*0.001).round();
+            if(distance<50.){
+                
+                vecofdist.push(
+                statdist{
+                    // name:format!("from {} to {}",vecofstationnames[found[0]],vecofstationnames[index]),
+                    name:format!("{:?}",vecofstationnames[index]),
+                    xcoord:(convert_spherical_to_cartesian(j[0],j[1], 6367.)).0-(convert_spherical_to_cartesian(i[0],i[1], 6367.)).0,
+                    ycoord:convert_spherical_to_cartesian(j[0],j[1], 6367.).1-(convert_spherical_to_cartesian(i[0],i[1], 6367.)).1,
+                    distance:
+                    (distance)
+                }
+            )
             }
-        )
         }
         println!("{ci}");
-        fs::write(format!("./selected.txt"), serde_json::to_string(&vecofdist).unwrap());
+    //     vecofdist.sort_by(|a,b|if(a.xcoord>b.xcoord){
+    //         Ordering::Greater
+    //     }
+    //     else{
+    //         Ordering::Less
+    //     }
+    // );
+        fs::write(format!("./selected.json"), serde_json::to_string(&vecofdist).unwrap());
         // vvecofdist.push(vecofdist)
     }
     println!("finished computation");
-//     vecofdist.sort_by(|a,b|if(a.distance>b.distance){
-//         Ordering::Greater
-//     }
-//     else{
-//         Ordering::Less
-//     }
-// );
+    
     // let mut sb=String::new();
     // for i in vvecofdist.clone(){
     //     sb=(format!("{} , {}",sb,serde_json::to_string(&i).unwrap()))
